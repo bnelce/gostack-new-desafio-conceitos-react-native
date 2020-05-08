@@ -28,6 +28,7 @@ apiMock.onGet("repositories").reply(200, [
     techs: ["React Native", "Node.js"],
     likes: 0,
   },
+
 ]);
 
 jest.mock(
