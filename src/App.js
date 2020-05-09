@@ -12,6 +12,7 @@ import {
 
 import api from './services/api';
 
+
 export default function App() {
 
   const [repositories, setRepositories] = useState([]);
@@ -20,7 +21,7 @@ export default function App() {
  async function loadData(){
    await api.get('/repositories').then(response =>{
       setRepositories(response.data);
-      console.log(response.data);  
+      //console.log(response.data);  
      });
   }
 
@@ -30,9 +31,21 @@ export default function App() {
 
   async function handleLikeRepository(id) {
     // Implement "Like Repository" functionality
-    await api.post(`/repositories/${id}/like`);     
-    loadData();      
+    const response = await api.post(`repositories/${id}/like`);
+
+    const likedRepository = response.data;
+
+    const repositoriesUpdated = repositories.map(repository => {
+      if (repository.id === id) {
+        return likedRepository;
+      } else {
+        return repository;
+      }
+    });
+
+    setRepositories(repositoriesUpdated);
   }
+
 
   return (
     <>
@@ -43,7 +56,7 @@ export default function App() {
         keyExtractor={repository => repository.id}
         renderItem={({item: repository}) => (
           <View style={styles.repositoryContainer}>
-          <Text style={styles.repository} key={repository.id}>{repository.title}</Text>         
+          <Text style={styles.repository} >{repository.title}</Text>         
 
           <View style={styles.techsContainer}>
           {repository.techs.map(tech => (
@@ -51,6 +64,7 @@ export default function App() {
               {tech}
             </Text>            
             ))}            
+
           </View>          
           <View style={styles.likesContainer}>
             <Text
@@ -58,11 +72,10 @@ export default function App() {
               // Remember to replace "1" below with repository ID: {`repository-likes-${repository.id}`}
               testID={`repository-likes-${repository.id}`}
             > 
-              {repository.likes == 1 ? "1 curtida" : `${repository.likes} curtidas` } 
-
+              {/* Versão anterior {repository.likes == 1 ? "1 curtida" : `${repository.likes} curtidas` } */}
+              {repository.likes} curtida{repository.likes > 1 ? 's' : ''}
             </Text>
           </View>
-
           <TouchableOpacity
             style={styles.button}
             onPress={() => handleLikeRepository(repository.id)}
